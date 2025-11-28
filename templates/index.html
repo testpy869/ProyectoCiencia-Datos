@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predicción Socavones López Portillo</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #31333F;
+            --primary-color: #ff4b4b; 
+            --gray-light: #f0f2f6;
+            --font-stack: "Source Sans Pro", sans-serif;
+        }
+
+        body {
+            font-family: var(--font-stack);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            padding: 2rem;
+        }
+
+        h1 { 
+            font-weight: 700; 
+            margin-bottom: 0.2rem; 
+            text-align: center; 
+        }
+        
+        .neighborhood-header {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #555;
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .subtitle { 
+            color: #666; 
+            font-size: 0.9rem; 
+            margin-bottom: 2rem; 
+            text-align: center;
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+        
+        hr { border: 0; border-top: 1px solid #ddd; margin: 2rem 0; }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .input-group { margin-bottom: 1rem; }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+            background-color: #fafafa;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 1px var(--primary-color);
+        }
+
+        small { color: #666; font-size: 0.8rem; display: block; margin-top: 0.2rem; }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            margin-top: 1rem;
+            transition: background 0.2s;
+        }
+        button:hover { background-color: #d93e3e; }
+        .metrics-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .metric-label { font-size: 0.85rem; color: #555; font-weight: 600;}
+        .metric-value { font-size: 1.8rem; font-weight: 700; margin: 0.2rem 0; color: #000;}
+        
+        .metric-delta { 
+            font-size: 0.85rem; 
+            display: flex; 
+            align-items: center; 
+            font-weight: 600;
+        }
+        
+        .delta-positive { color: #009933; }
+        .delta-negative { color: #ff2b2b; }
+        .delta-neutral { color: #666; }
+
+        details {
+            background-color: #f0f2f6;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            margin-top: 2rem;
+        }
+        summary { cursor: pointer; font-weight: 600; outline: none; }
+        .details-content { padding: 1rem; font-size: 0.95rem; line-height: 1.5; }
+        
+        .math-block {
+            background: white;
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: "Courier New", monospace;
+            margin: 1rem 0;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        @media (max-width: 600px) {
+            .row, .metrics-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Predicción de Socavones</h1>
+        <div class="neighborhood-header">
+            Col. José López Portillo (Iztapalapa)
+        </div>
+        <form method="POST">
+            <div class="row">
+                <div>
+                    <div style="font-weight: bold; margin-bottom: 1rem; font-size: 1.1rem; color: #333;">Datos Ambientales</div>
+                    
+                    <div class="input-group">
+                        <label>Precipitación Anual (mm)</label>
+                        <input type="number" step="0.1" name="precipitacion" value="{{ inp.p }}" required>
+                        <small>Coeficiente negativo (-0.025)</small>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Extracción Acuífero (m³)</label>
+                        <input type="number" step="1" name="extraccion" value="{{ inp.e }}" required>
+                        <small>Factor de estrés hídrico</small>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="font-weight: bold; margin-bottom: 1rem; font-size: 1.1rem; color: #333;">Infraestructura</div>
+                    
+                    <div class="input-group">
+                        <label>Fugas de Agua (Actuales)</label>
+                        <input type="number" step="1" name="fugas" value="{{ inp.f }}" required>
+                        <small>Variable crítica (0.0923)</small>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Fugas Año Anterior</label>
+                        <input type="number" step="1" name="fugas_anterior" value="{{ inp.f_ant }}" required>
+                        <small>Para Cálculo Diferencial (Tendencia)</small>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit">Calcular Riesgo</button>
+        </form>
+
+        {% if res %}
+        <hr>
+        <div style="font-weight: bold; font-size: 1.2rem; margin-bottom: 1rem;">Resultados del Análisis</div>
+
+        <div class="metrics-container">
+            <div class="metric-card">
+                <div class="metric-label">Socavones Estimados</div>
+                <div class="metric-value">{{ res.estimados }}</div>
+                <div class="metric-delta delta-neutral">
+                    {{ res.exacto }} (Valor exacto)
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Nivel de Riesgo</div>
+                <div class="metric-value" style="font-size: 1.4rem; line-height: 2.2rem;">
+                    {{ res.riesgo }}
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Tendencia (Derivada Fugas)</div>
+                <div class="metric-value" style="font-size: 1.5rem;">{{ res.derivada }}</div>
+                
+                {% if res.derivada_valor > 0 %}
+                    <div class="metric-delta delta-negative">
+                        ▲ Acelerando Riesgo
+                    </div>
+                {% elif res.derivada_valor < 0 %}
+                    <div class="metric-delta delta-positive">
+                        ▼ Disminuyendo Riesgo
+                    </div>
+                {% else %}
+                     <div class="metric-delta delta-neutral">Estable</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <details>
+            <summary>desglose matemático</summary>
+            <div class="details-content">
+                <p><strong>Fórmula del Modelo:</strong></p>
+                <div class="math-block">
+                    S ≈ (-0.025 · P) + (0.0923 · F) + (1.37e-5 · E)
+                </div>
+                <p><strong>Impacto por variable:</strong></p>
+                <ul>
+                    <li>Precipitación: {{ res.aporte_p }} (Estabilizador)</li>
+                    <li>Fugas: {{ res.aporte_f }} (Desestabilizador Principal)</li>
+                    <li>Extracción: {{ res.aporte_e }} (Acumulativo)</li>
+                </ul>
+                <p><strong>Cálculo Diferencial:</strong></p>
+                <p>La derivada calculada es de <b>{{ res.derivada_valor }}</b>. Esto representa la pendiente de la curva de deterioro de la infraestructura respecto al año anterior.</p>
+            </div>
+        </details>
+        {% endif %}
+    </div>
+</body>
+</html>
